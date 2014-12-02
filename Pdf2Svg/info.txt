@@ -1,0 +1,21 @@
+﻿
+InkScape:
+https://www10.cor-asp.ch/ApWebServices/ApDrawingPDFs.aspx?p=SwissRe_Test_V3&d=ALO3_4&xlr=86.142632&ylr=80.31132258646616&yul=-14.843246586466165&xul=-40.41294499999999&dx=717&dy=538&L=basic+floor+plan+web&S=&SEL=0000000000L1001I20&F=PNG&uu=2
+
+https://www10.cor-asp.ch/ApWebServices/ApDrawingImages.aspx?p=SwissRe_Test_V3&d=ALO3_4&xlr=86.142632&ylr=80.31132258646616&yul=-14.843246586466165&xul=-40.41294499999999&dx=1152&dy=864&L=basic+floor+plan+web&S=&SEL=0000000000L1001I20&F=png&uu=2
+
+
+http://www.cityinthesky.co.uk/opensource/pdf2svg/
+pdf2svg <input.pdf> <output.svg> [<pdf page no. or "all" >]
+pdf2svg input.pdf output_page%d.svg all
+
+
+Aspose.Pdf.Document doc = new Aspose.Pdf.Document(@"C:\TestReport.pdf");
+// instantiate an object of SvgSaveOptions
+Aspose.Pdf.SvgSaveOptions saveOptions = new Aspose.Pdf.SvgSaveOptions();
+// do not compress SVG image to Zip archive
+saveOptions.CompressOutputToZipArchive = false;
+// resultant file name
+string outFileName = @"C:\TestReport.svg";
+// save the output in SVG files
+doc.Save(outFileName, saveOptions);
