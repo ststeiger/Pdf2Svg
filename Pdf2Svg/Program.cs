@@ -26,7 +26,7 @@ namespace Pdf2Svg
             }
 
             SvgConverter.ConvertSingleFile("1010_GB02_ZG00_0000"); // Dwg.Name
-            //SvgConverter.ConvertAllFiles();
+            // SvgConverter.ConvertAllFiles();
 
             System.Console.WriteLine(System.Environment.NewLine);
             System.Console.WriteLine(" --- Press any key to continue --- ");

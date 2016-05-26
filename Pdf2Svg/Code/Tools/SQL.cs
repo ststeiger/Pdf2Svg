@@ -10,12 +10,13 @@ namespace Pdf2Svg
     {
 
 
-        public static string GetConnectionString()
+        public static string GetConnectionStringOld()
         {
             System.Data.SqlClient.SqlConnectionStringBuilder csb = new System.Data.SqlClient.SqlConnectionStringBuilder();
             csb.DataSource = System.Environment.MachineName;
             csb.InitialCatalog = "COR_Basic_Swisscom";
             csb.IntegratedSecurity = true;
+
             if (!csb.IntegratedSecurity)
             {
                 csb.UserID = "ApertureWebServicesDE";
@@ -34,6 +35,66 @@ namespace Pdf2Svg
 
             return csb.ConnectionString;
         }
+
+        private static string m_staticConnectionString;
+        private static string m_DataProvider;
+
+        public static string GetConnectionString()
+        {
+            string strReturnValue = null;
+
+            if (string.IsNullOrEmpty(m_staticConnectionString))
+            {
+                string strConnectionStringName = System.Environment.MachineName;
+
+                if (string.IsNullOrEmpty(strConnectionStringName))
+                {
+                    strConnectionStringName = "LocalSqlServer";
+                }
+
+                System.Configuration.ConnectionStringSettingsCollection settings = System.Configuration.ConfigurationManager.ConnectionStrings;
+                if ((settings != null))
+                {
+                    foreach (System.Configuration.ConnectionStringSettings cs in settings)
+                    {
+                        if (System.StringComparer.OrdinalIgnoreCase.Equals(cs.Name, strConnectionStringName))
+                        {
+                            strReturnValue = cs.ConnectionString;
+                            m_staticConnectionString = strReturnValue;
+                            m_DataProvider = cs.ProviderName;
+                            break; // TODO: might not be correct. Was : Exit For
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(strReturnValue))
+                {
+                    strConnectionStringName = "server";
+
+                    System.Configuration.ConnectionStringSettings conString = System.Configuration.ConfigurationManager.ConnectionStrings[strConnectionStringName];
+
+                    if (conString != null)
+                    {
+                        strReturnValue = conString.ConnectionString;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(strReturnValue))
+                {
+                    throw new System.ArgumentNullException("ConnectionString \"" + strConnectionStringName + "\" in file web.config.");
+                }
+
+                settings = null;
+                strConnectionStringName = null;
+            }
+            else // of if (string.IsNullOrEmpty(strStaticConnectionString))
+            {
+                return m_staticConnectionString;
+            }
+
+            return strReturnValue;
+        } // End Function GetConnectionString
+
 
 
         public static System.Data.IDbConnection GetConnection()

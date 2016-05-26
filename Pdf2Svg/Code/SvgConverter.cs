@@ -340,7 +340,12 @@ namespace Pdf2Svg
                 return;
 
             // EXPType_ Export-Typ - Deine Code läuft nur wenn Wert = "SVG"
-            if (!(ExportSettings.ExportFileType == ExportFileType_t.svg || ExportSettings.ExportFileType == ExportFileType_t.pdf))
+            if (
+               !(
+                        ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.svg)
+                    ||  ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.pdf)
+                )
+            )
                 return;
 
 

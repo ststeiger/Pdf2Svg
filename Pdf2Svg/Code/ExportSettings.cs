@@ -41,16 +41,15 @@ namespace Pdf2Svg
         public static bool ExecuteExport = true; // Export ausführen 
         public static bool AskBeforeExport = false; // vor Export nachfragen 
 
-        public static bool DateTimeInFileName = true; // Datum u. Zeitstempel im Dateinamen 
-        public static bool OverwriteFileIfExists = true; // vorhandene Datei ohne Datum u. Zeitstempel im Dateinamen überschreiben 
+        public static bool DateTimeInFileName = false; // Datum u. Zeitstempel im Dateinamen 
+        public static bool OverwriteFileIfExists = false; // vorhandene Datei ohne Datum u. Zeitstempel im Dateinamen überschreiben 
         public static bool ExportWithSubdirectories = true; // wenn True dann Pfad mit Unterverzeichnissen für SO, GB u.s.w. sonst Datei in Haupverzeichnis abspeichern 
 
         public static string ExportDirectory = @"D:\stefan.steiger\Downloads\SwisscomDrawings"; // \\ads01\Wincasa_DWG_Temp$\SVGExportSwisscom ;Pfad für den Export der Dateien 
         // public static ExportFileType_t ExportFileType = ExportFileType_t.svg; // Deine Code läuft nur wenn Wert = "SVG"
-        public static ExportFileType_t ExportFileType = ExportFileType_t.pdf | ExportFileType_t.svg;
+        //public static ExportFileType_t ExportFileType = ExportFileType_t.pdf | ExportFileType_t.svg;
+        public static ExportFileType_t ExportFileType = ExportFileType_t.pdf;
         
-
-
 
         public static string ApertureWebServiceUrl = InternalGetURL(); // http://vm-wincasa
 
