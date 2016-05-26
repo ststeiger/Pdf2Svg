@@ -117,24 +117,6 @@ namespace Pdf2Svg
         } // End Function BeautifyXML
 
 
-        public static System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex(@"(<text\s*.*?>)(.*?)(</text>)", System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.Compiled);
-
-
-        public static string SanitizeTextTags(System.Text.RegularExpressions.Match match)
-        {
-            string val1 = match.Groups[1].Value;
-            string val2 = match.Groups[2].Value;
-            string val3 = match.Groups[3].Value;
-
-            // <text transform="matrix(0.5 0 0 0.5 1601 803.6625)" x="0" y="0" style="fill:#000000;font-family:WKIRTS+Helvetica;" font-size="9">
-            //      ZR Ø30  <- 1%
-		    // </text>
-
-            // Ein Name darf nicht mit dem Zeichen '-', hexadezimaler Wert 0x2D, beginnen. Zeile 3423, Position 11.
-
-            //return val1 + val2.Replace("<", "&lt;").Replace(">", "&gt;") + val3;
-            return val1 + XmlEscape(val2) + val3;
-        } // End Function SanitizeTextTags 
 
 
         public static string XmlEscape(string unescaped)
@@ -153,6 +135,26 @@ namespace Pdf2Svg
             node.InnerXml = escaped;
             return node.InnerText;
         } // End Function XmlUnescape
+
+
+        public static System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex(@"(<text\s*.*?>)(.*?)(</text>)", System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+
+        public static string SanitizeTextTags(System.Text.RegularExpressions.Match match)
+        {
+            string val1 = match.Groups[1].Value;
+            string val2 = match.Groups[2].Value;
+            string val3 = match.Groups[3].Value;
+
+            // <text transform="matrix(0.5 0 0 0.5 1601 803.6625)" x="0" y="0" style="fill:#000000;font-family:WKIRTS+Helvetica;" font-size="9">
+            //      ZR Ø30  <- 1%
+		    // </text>
+
+            // Ein Name darf nicht mit dem Zeichen '-', hexadezimaler Wert 0x2D, beginnen. Zeile 3423, Position 11.
+
+            //return val1 + val2.Replace("<", "&lt;").Replace(">", "&gt;") + val3;
+            return val1 + XmlEscape(val2) + val3;
+        } // End Function SanitizeTextTags 
 
 
         public static string SanitizeXml(string FileName)
@@ -230,14 +232,30 @@ namespace Pdf2Svg
         } // End Sub RemoveEvalString
 
 
-        public static string ConvertFile(string DrawingName)
+        public class cConversionResult
         {
-            byte[] baReturnValue = null;
+            public byte[] PDF;
+            public string SVG;
+
+            public cConversionResult()
+            {
+                this.PDF = null;
+                this.SVG = null;
+            }
+
+        }
+
+
+        public static cConversionResult ConvertFile(string DrawingName)
+        {
+            cConversionResult ConversionResult = new cConversionResult();
             string URL = null;
+
+
 
             try
             {
-                URL = string.Format(SvgSettings.GetURL(), DrawingName);
+                URL = string.Format(ExportSettings.ApertureWebServiceUrl, DrawingName);
 
                 // string RemoteURL = "https://www9.cor-asp.ch/ApWebServices/ApDrawingPDFs.aspx?p=SwisscomTest_Portal&d={0}&L=Z_Export&S=Z_Export";
                 // string LocalURL = "http://vm-wincasa/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal&d={0}&L=Z_Export&S=Z_Export";
@@ -247,7 +265,7 @@ namespace Pdf2Svg
                 //baReturnValue = DownloadPdf("http://vm-wincasa/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal&d=1010_GB01_UG02_0000&L=Z_Export");
                 // http://vm-wincasa/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal&d=1010_GB01_UG02_0000&L=Z_Export&S=Z_Export
 
-                baReturnValue = DownloadPdf(URL);
+                ConversionResult.PDF = DownloadPdf(URL);
             }
             catch (System.Net.WebException we)
             {
@@ -258,12 +276,13 @@ namespace Pdf2Svg
                 System.Console.WriteLine(ex.Message);
             }
 
-            string outFileName = System.IO.Path.GetTempFileName();
 
+#if WITH_ASPOSE 
 
-            using (System.IO.Stream ms = new System.IO.MemoryStream(baReturnValue))
+            string temporaryOutFileName = System.IO.Path.GetTempFileName();
+
+            using (System.IO.Stream ms = new System.IO.MemoryStream(ConversionResult.PDF))
             {
-
                 // using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(@"dwg17.pdf"))
                 using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(ms))
                 {
@@ -272,17 +291,18 @@ namespace Pdf2Svg
                     // do not compress SVG image to Zip archive
                     saveOptions.CompressOutputToZipArchive = false;
 
-                    doc.Save(outFileName, saveOptions);
+                    doc.Save(temporaryOutFileName, saveOptions);
                 } // End Using doc
-
+                
                 ms.Close();
             } // End Using ms
 
-            string SVG = RemoveEvalString(outFileName, URL);
-            if (System.IO.File.Exists(outFileName))
-                System.IO.File.Delete(outFileName);
+            ConversionResult.SVG = RemoveEvalString(temporaryOutFileName, URL);
+            if (System.IO.File.Exists(temporaryOutFileName))
+                System.IO.File.Delete(temporaryOutFileName);
+#endif
 
-            return SVG;
+            return ConversionResult;
         } // End Function ConvertFile
 
 
@@ -311,34 +331,22 @@ namespace Pdf2Svg
         } // End Sub InsertDocument 
 
 
-        public static string CombinePaths_Net2(string first, params string[] others)
-        {
-            // Put error checking in here :)
-            string path = first;
-            foreach (string section in others)
-            {
-                path = System.IO.Path.Combine(path, section);
-            }
-            return path;
-        } // End Function CombinePaths_Net2
-
-
         public static void SaveSVG(string strGS_UID, string strDrawing, string strSO_Nr, string strGB_Nr)
         {
-            if (!SvgSettings.ConfigurationCorrect) 
-	            return;
+            if (!ExportSettings.ConfigurationCorrect)
+                return;
 
-            if (!SvgSettings.DOExp) // DOExp: Export ausführen 
+            if (!ExportSettings.ExecuteExport) // ExecuteExport: Export ausführen 
                 return;
 
             // EXPType_ Export-Typ - Deine Code läuft nur wenn Wert = "SVG"
-            if (!System.StringComparer.InvariantCultureIgnoreCase.Equals(SvgSettings.EXPType, "SVG"))
+            if (!(ExportSettings.ExportFileType == ExportFileType_t.svg || ExportSettings.ExportFileType == ExportFileType_t.pdf))
                 return;
 
 
-            if (SvgSettings.ASCExp) // ASCExp: vor Export nachfragen 
+            if (ExportSettings.AskBeforeExport) // ASCExp: vor Export nachfragen 
             {
-                DialogResult diagRes = MessageBox.Show("Wollen Sie die SVG-Datei aktualisieren ?", "SVG aktulaisieren", MessageBoxButtons.YesNo);
+                DialogResult diagRes = MessageBox.Show("Wollen Sie die Datei aktualisieren ?", "Aktualisieren", MessageBoxButtons.YesNo);
                 if (diagRes != DialogResult.Yes)
                 {
                     return;
@@ -348,12 +356,12 @@ namespace Pdf2Svg
                     //do something else
                     return;
                 }
-            } // End if (SvgSettings.ASCExp)
+            } // End if (SvgSettings.AskBeforeExport)
 
 
-            string strPath = SvgSettings.EXPPath;
-            if (SvgSettings.EXPPathSchema)
-                strPath = CombinePaths_Net2(strPath, strSO_Nr, strGB_Nr); //, strGS_DisplayNr);
+            string strPath = ExportSettings.ExportDirectory;
+            if (ExportSettings.ExportWithSubdirectories)
+                strPath = Helpers.CombinePaths(strPath, strSO_Nr, strGB_Nr); //, strGS_DisplayNr);
 
             if (!System.IO.Directory.Exists(strPath))
                 System.IO.Directory.CreateDirectory(strPath);
@@ -361,36 +369,64 @@ namespace Pdf2Svg
             string dateToAppend = System.DateTime.Now.ToString("'_'yyyyMMdd_HHmmss");
             string strRawFileName = strDrawing;
             string strFileName = strRawFileName;
-            
-            
+
+
             // DateTimeExp: Datum u. Zeitstempel im Dateinamen 
             // DWGReplace: vorhandene Datei ohne Datum u. Zeitstempel im Dateinamen überschreiben 
-            if (SvgSettings.DateTimeExp)
+            if (ExportSettings.DateTimeInFileName)
                 strFileName += dateToAppend;
 
-            string fn = System.IO.Path.Combine(strPath, strFileName + ".svg");
-            string fnWithoutDate = System.IO.Path.Combine(strPath, strRawFileName + ".svg");
+            string saveFileNameWithDate = System.IO.Path.Combine(strPath, strFileName);
+            string saveFileNameWithoutDate = System.IO.Path.Combine(strPath, strRawFileName);
 
 
-            string svg = ConvertFile(strDrawing);
-            System.IO.File.WriteAllText(fn, svg, System.Text.Encoding.UTF8);
-            if (SvgSettings.DateTimeExp && SvgSettings.DWGReplace)
+            cConversionResult ConversionResult = ConvertFile(strDrawing);
+
+
+
+            if (ExportSettings.DateTimeInFileName)
             {
-                System.IO.File.WriteAllText(fnWithoutDate, svg, System.Text.Encoding.UTF8);
+                if (ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.svg))
+                    if (ConversionResult.SVG != null)
+                        System.IO.File.WriteAllText(saveFileNameWithDate + ".svg", ConversionResult.SVG, System.Text.Encoding.UTF8);
+
+                if (ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.pdf))
+                    if (ConversionResult.PDF != null)
+                        System.IO.File.WriteAllBytes(saveFileNameWithDate + ".pdf", ConversionResult.PDF);
             }
 
 
-            if (SvgSettings.SaveToDatabase)
+            if (!ExportSettings.DateTimeInFileName || ExportSettings.DateTimeInFileName && ExportSettings.OverwriteFileIfExists)
             {
-                byte[] bom = System.Text.Encoding.UTF8.GetPreamble();
-                byte[] baSVG = System.Text.Encoding.UTF8.GetBytes(svg);
-                byte[] baDestFile = new byte[baSVG.Length + bom.Length];
-                System.Array.Copy(bom, baDestFile, bom.Length);
-                System.Array.Copy(baSVG, 0, baDestFile, bom.Length, baSVG.Length);
+                string svgFile = saveFileNameWithoutDate + ".svg";
+                string pdfFile = saveFileNameWithoutDate + ".pdf";
 
-                int BE_ID = 12768;
-                InsertDocument(BE_ID, strGS_UID, baDestFile, strDrawing, strFileName);
-            } // End if (SvgSettings.SaveToDatabase)
+
+                if (ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.svg))
+                    if (ConversionResult.SVG != null)
+                        System.IO.File.WriteAllText(svgFile, ConversionResult.SVG, System.Text.Encoding.UTF8);
+
+                if (ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.pdf))
+                    if (ConversionResult.PDF != null)
+                        System.IO.File.WriteAllBytes(pdfFile, ConversionResult.PDF);
+            }
+
+            if (ConversionResult.SVG != null)
+            {
+
+                if (ExportSettings.ExportFileType.IsFlagSet(ExportFileType_t.svg) && ExportSettings.SaveToDatabase)
+                {
+                    byte[] bom = System.Text.Encoding.UTF8.GetPreamble();
+                    byte[] baSVG = System.Text.Encoding.UTF8.GetBytes(ConversionResult.SVG);
+                    byte[] baDestFile = new byte[baSVG.Length + bom.Length];
+                    System.Array.Copy(bom, baDestFile, bom.Length);
+                    System.Array.Copy(baSVG, 0, baDestFile, bom.Length, baSVG.Length);
+
+                    int BE_ID = 12768;
+                    InsertDocument(BE_ID, strGS_UID, baDestFile, strDrawing, strFileName);
+                } // End if (SvgSettings.SaveToDatabase)
+
+            } // End if (svg != null)
 
         } // End Sub SaveSVG
 
