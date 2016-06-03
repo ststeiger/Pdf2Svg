@@ -24,8 +24,13 @@ namespace Pdf2Svg
         private static string InternalGetURL(bool bLocal)
         {
             string URL = "{0}/ApWebServices/ApDrawingPDFs.aspx?p={1}&d={{0}}&L=Z_Export&S=Z_Export";
+            // URL = "ajax/PdfLegende.ashx?path=https://prod.swisscom-flaechen.ch/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal$amp$d=1002_GB01_OG01_0000$amp$L=Raum$amp$S=Nutzungsart$amp$SEL=0000000002QR0006CA$amp$F=PNG$amp$uu=5&BE_ID=Administrator&legendvisible=true";
 
             string BaseURL = "http://vm-wincasa";
+            BaseURL = "https://prod.swisscom-flaechen.ch/COR_Basic_Swisscom/";
+
+            
+
             string PortalName = "Swisscom_Portal";
 
             if (!bLocal)
@@ -34,7 +39,10 @@ namespace Pdf2Svg
                 PortalName = "SwisscomTest_Portal";
             }
 
-            return string.Format(URL, BaseURL, PortalName);
+            // return string.Format(URL, BaseURL, PortalName);
+            
+            // https://prod.swisscom-flaechen.ch/COR_Basic_Swisscom/ajax/PdfLegende.ashx?path=https://prod.swisscom-flaechen.ch/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal$amp$d=1002_GB01_OG01_0000$amp$L=Raum$amp$S=Nutzungsart$amp$SEL=0000000002QR0006CA$amp$F=PNG$amp$uu=5&BE_ID=Administrator&legendvisible=true
+            return "https://prod.swisscom-flaechen.ch/COR_Basic_Swisscom/ajax/PdfLegende.ashx?path=https://prod.swisscom-flaechen.ch/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal$amp$d={0}$amp$L=Raum$amp$S=Nutzungsart$amp$SEL={1}$amp$F=PNG$amp$uu=5&BE_ID=Administrator&legendvisible=true";
         } // End Function InternalGetURL 
 
 
@@ -51,7 +59,7 @@ namespace Pdf2Svg
         public static ExportFileType_t ExportFileType = ExportFileType_t.pdf;
         
 
-        public static string ApertureWebServiceUrl = InternalGetURL(); // http://vm-wincasa
+        public static string ApertureWebServiceUrl111 = InternalGetURL(); // http://vm-wincasa
 
         public static bool SaveToDatabase = false;
         public static bool ConfigurationCorrect = true;

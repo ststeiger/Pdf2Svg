@@ -20,7 +20,7 @@ SELECT TOP 1
 	,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_UID
 	,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumVon
 	,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumBis
-	,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureObjID
+	,COALESCE(T_AP_LinkDWG.LI_ApertureObjID, T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureObjID) AS ZO_GSDWG_ApertureObjID 
 FROM T_ZO_AP_Geschoss_DWG 
 
 LEFT JOIN T_AP_Geschoss 
@@ -29,6 +29,9 @@ LEFT JOIN T_AP_Geschoss
 LEFT JOIN T_AP_Ref_Geschosstyp 
 	ON T_AP_Ref_Geschosstyp.GST_UID = T_AP_Geschoss.GS_GST_UID 
 	
+LEFT JOIN T_AP_LinkDWG 
+	ON T_AP_LinkDWG.LI_ApertureDWG = T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureDWG 
+
 LEFT JOIN T_AP_Gebaeude 
 	ON T_AP_Gebaeude.GB_UID = T_AP_Geschoss.GS_GB_UID 
 	

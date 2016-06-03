@@ -246,7 +246,7 @@ namespace Pdf2Svg
         }
 
 
-        public static cConversionResult ConvertFile(string DrawingName)
+        public static cConversionResult ConvertFile(string drawingName, string polygonID)
         {
             cConversionResult ConversionResult = new cConversionResult();
             string URL = null;
@@ -255,7 +255,7 @@ namespace Pdf2Svg
 
             try
             {
-                URL = string.Format(ExportSettings.ApertureWebServiceUrl, DrawingName);
+                URL = string.Format(ExportSettings.ApertureWebServiceUrl111, drawingName, polygonID);
 
                 // string RemoteURL = "https://www9.cor-asp.ch/ApWebServices/ApDrawingPDFs.aspx?p=SwisscomTest_Portal&d={0}&L=Z_Export&S=Z_Export";
                 // string LocalURL = "http://vm-wincasa/ApWebServices/ApDrawingPDFs.aspx?p=Swisscom_Portal&d={0}&L=Z_Export&S=Z_Export";
@@ -331,7 +331,7 @@ namespace Pdf2Svg
         } // End Sub InsertDocument 
 
 
-        public static void SaveSVG(string strGS_UID, string strDrawing, string strSO_Nr, string strGB_Nr)
+        public static void SaveSVG(string strGS_UID, string strDrawing, string polygonId, string strSO_Nr, string strGB_Nr)
         {
             if (!ExportSettings.ConfigurationCorrect)
                 return;
@@ -385,7 +385,7 @@ namespace Pdf2Svg
             string saveFileNameWithoutDate = System.IO.Path.Combine(strPath, strRawFileName);
 
 
-            cConversionResult ConversionResult = ConvertFile(strDrawing);
+            cConversionResult ConversionResult = ConvertFile(strDrawing, polygonId);
 
 
 
@@ -454,7 +454,7 @@ namespace Pdf2Svg
             //public string ZO_GSDWG_UID;
             //public string ZO_GSDWG_DatumVon;
             //public string ZO_GSDWG_DatumBis;
-            //public string ZO_GSDWG_ApertureObjID;
+            public string ZO_GSDWG_ApertureObjID;
         } // End Class cDwgInfo
 
 
@@ -476,6 +476,8 @@ namespace Pdf2Svg
                         DwgInfo.ZO_GSDWG_ApertureDWG = System.Convert.ToString(dr["ZO_GSDWG_ApertureDWG"]);
                         DwgInfo.SO_Nr = System.Convert.ToString(dr["SO_Nr"]);
                         DwgInfo.GB_Nr = System.Convert.ToString(dr["GB_Nr"]);
+                        DwgInfo.ZO_GSDWG_ApertureObjID = System.Convert.ToString(dr["ZO_GSDWG_ApertureObjID"]);
+                        
 
                         DwgInfo.HaveInfo = true;
                     } // End if (dt != null && dt.Rows.Count > 0)
@@ -492,7 +494,7 @@ namespace Pdf2Svg
         {
             cDwgInfo DwgInfo = GetDwgInfo(strApertureDWG);
             if (DwgInfo.HaveInfo)
-                SaveSVG(DwgInfo.GS_UID, DwgInfo.ZO_GSDWG_ApertureDWG, DwgInfo.SO_Nr, DwgInfo.GB_Nr);
+                SaveSVG(DwgInfo.GS_UID, DwgInfo.ZO_GSDWG_ApertureDWG, DwgInfo.ZO_GSDWG_ApertureObjID, DwgInfo.SO_Nr, DwgInfo.GB_Nr);
         } // End Sub ConvertSingleFile
 
 
@@ -511,7 +513,9 @@ namespace Pdf2Svg
                     // string strGS_Nr = System.Convert.ToString(dr["GS_Nr"]);
                     // string strGS_DisplayNr = System.Convert.ToString(dr["GS_DisplayNr"]);
 
-                    SaveSVG(strGS_UID, strDrawing, strSO_Nr, strGB_Nr);
+                    string polygonId = System.Convert.ToString(dr["ZO_GSDWG_ApertureObjID"]);
+
+                    SaveSVG(strGS_UID, strDrawing, polygonId, strSO_Nr, strGB_Nr);
                 } // Next dr 
 
             } // End Using dt 

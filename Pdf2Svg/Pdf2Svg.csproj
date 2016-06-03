@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Pdf2Svg</RootNamespace>
     <AssemblyName>Pdf2Svg</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,6 +36,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus, Version=4.0.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\EPPlus\4.0.4\EPPlus.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -74,6 +78,7 @@
     <None Include="connections.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Gebäudepläne.xlsx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -87,6 +92,8 @@
   <ItemGroup>
     <Content Include="info.txt" />
     <Content Include="Libs\AsposePDF\9.4\Aspose.Pdf.dll" />
+    <Content Include="Libs\EPPlus\4.0.4\EPPlus.dll" />
+    <Content Include="Libs\EPPlus\4.0.4\EPPlus.XML" />
     <EmbeddedResource Include="SQL\Geschosszeichnungen.sql" />
     <EmbeddedResource Include="SQL\Insert_Dokument.sql" />
     <EmbeddedResource Include="SQL\Geschoss.sql" />

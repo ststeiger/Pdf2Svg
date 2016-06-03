@@ -59,7 +59,7 @@ SELECT
 	--,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_UID
 	--,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumVon
 	--,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumBis
-	--,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureObjID
+	,COALESCE(T_AP_LinkDWG.LI_ApertureObjID, T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureObjID) AS ZO_GSDWG_ApertureObjID 
 FROM T_ZO_AP_Geschoss_DWG 
 
 LEFT JOIN T_AP_Geschoss 
@@ -67,6 +67,9 @@ LEFT JOIN T_AP_Geschoss
 	
 LEFT JOIN T_AP_Ref_Geschosstyp 
 	ON T_AP_Ref_Geschosstyp.GST_UID = T_AP_Geschoss.GS_GST_UID 
+	
+LEFT JOIN T_AP_LinkDWG 
+	ON T_AP_LinkDWG.LI_ApertureDWG = T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureDWG 
 	
 LEFT JOIN T_AP_Gebaeude 
 	ON T_AP_Gebaeude.GB_UID = T_AP_Geschoss.GS_GB_UID 
@@ -77,6 +80,13 @@ LEFT JOIN T_AP_Standort
 WHERE T_ZO_AP_Geschoss_DWG.ZO_GSDWG_Status = 1 
 -- AND {fn curdate()} BETWEEN CAST(T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumVon AS date) AND CAST(T_ZO_AP_Geschoss_DWG.ZO_GSDWG_DatumBis AS date) 
 
+AND T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureDWG IN 
+(
+	SELECT -- ZeichnungsTyp, 
+		Zeichnungsname 
+	FROM ___SwisscomExportListe 
+
+)
 
 GROUP BY 
  SO_Nr, SO_Bezeichnung
@@ -84,5 +94,6 @@ GROUP BY
 ,T_AP_Ref_Geschosstyp.GST_Kurz_DE, T_AP_Ref_Geschosstyp.GST_Lang_DE, T_AP_Geschoss.GS_Nr 
 ,T_AP_Ref_Geschosstyp.GST_Sort, T_AP_Ref_Geschosstyp.GST_GS_NrMultiplikator, T_AP_Ref_Geschosstyp.GST_ZG_Sort
 ,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureDWG 
+,T_ZO_AP_Geschoss_DWG.ZO_GSDWG_ApertureObjID,T_AP_LinkDWG.LI_ApertureObjID 
 
 ORDER BY SO_Nr, GB_Nr, RPT_GS_Sort 
