@@ -82,7 +82,6 @@
     <None Include="connections.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Gebäudepläne.xlsx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -98,6 +97,7 @@
     <Content Include="Libs\AsposePDF\9.4\Aspose.Pdf.dll" />
     <Content Include="Libs\EPPlus\4.0.4\EPPlus.dll" />
     <Content Include="Libs\EPPlus\4.0.4\EPPlus.XML" />
+    <EmbeddedResource Include="SQL\CreateTableFromExcel.sql" />
     <EmbeddedResource Include="SQL\Geschosszeichnungen.sql" />
     <EmbeddedResource Include="SQL\Insert_Dokument.sql" />
     <EmbeddedResource Include="SQL\Geschoss.sql" />
