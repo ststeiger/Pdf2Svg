@@ -14,7 +14,7 @@ namespace Pdf2Svg
         {
             System.Data.SqlClient.SqlConnectionStringBuilder csb = new System.Data.SqlClient.SqlConnectionStringBuilder();
             csb.DataSource = System.Environment.MachineName;
-            csb.InitialCatalog = "COR_Basic_Swisscom";
+            csb.InitialCatalog = "SwissComRZ";
             csb.IntegratedSecurity = true;
 
             if (!csb.IntegratedSecurity)
